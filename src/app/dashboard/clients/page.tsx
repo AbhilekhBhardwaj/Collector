@@ -139,7 +139,7 @@ export default function ClientsPage() {
 
       <div className="mt-4 flex items-center gap-4">
         <label className="text-sm flex items-center gap-2">
-          <input type="checkbox" checked={gstRegistered} onChange={(e) => setGstRegistered(e.target.checked)} />
+          <input type="checkbox" checked={gstRegistered} onChange={(e) => setGstRegisteredState(e.target.checked)} />
           GST registered?
         </label>
         <span className="text-xs text-black/60 dark:text-white/60">Exports are zero-rated; GST applies only for domestic clients.</span>
@@ -157,6 +157,7 @@ export default function ClientsPage() {
         <div className="grid gap-2">
           <label className="text-sm">Billing model</label>
           <select value={billingModel} onChange={(e) => setBillingModel(e.target.value as BillingModel)} className="h-10 rounded-md border border-black/10 dark:border-white/15 bg-transparent px-3">
+            <option>Hourly</option>
             <option>Monthly</option>
             <option>Project</option>
           </select>
