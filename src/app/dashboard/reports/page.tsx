@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 
 function toCSV(rows: Record<string, string | number>[]) {
-  const headers = Object.keys(rows[0] || {});
+  const headers = rows.length > 0 ? Object.keys(rows[0]) : [];
   const lines = [headers.join(","), ...rows.map((r) => headers.map((h) => r[h]).join(","))];
   return lines.join("\n");
 }

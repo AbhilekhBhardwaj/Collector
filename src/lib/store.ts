@@ -38,6 +38,7 @@ const TASK_KEY = "collector_tasks";
 const EXP_KEY = "collector_expenses";
 
 export function getClients(): StoredClient[] {
+  if (typeof window === "undefined") return [];
   try {
     const raw = localStorage.getItem(CLIENTS_KEY);
     return raw ? (JSON.parse(raw) as StoredClient[]) : [];
@@ -47,18 +48,22 @@ export function getClients(): StoredClient[] {
 }
 
 export function setClients(clients: StoredClient[]) {
+  if (typeof window === "undefined") return;
   localStorage.setItem(CLIENTS_KEY, JSON.stringify(clients));
 }
 
 export function getGSTRegistered(): boolean {
+  if (typeof window === "undefined") return false;
   return localStorage.getItem(GST_REG_KEY) === "true";
 }
 
 export function setGSTRegistered(v: boolean) {
+  if (typeof window === "undefined") return;
   localStorage.setItem(GST_REG_KEY, String(v));
 }
 
 export function getTimeEntries(): TimeEntry[] {
+  if (typeof window === "undefined") return [];
   try {
     const raw = localStorage.getItem(TIME_KEY);
     return raw ? (JSON.parse(raw) as TimeEntry[]) : [];
@@ -68,10 +73,12 @@ export function getTimeEntries(): TimeEntry[] {
 }
 
 export function setTimeEntries(entries: TimeEntry[]) {
+  if (typeof window === "undefined") return;
   localStorage.setItem(TIME_KEY, JSON.stringify(entries));
 }
 
 export function getTasks(): Task[] {
+  if (typeof window === "undefined") return [];
   try {
     const raw = localStorage.getItem(TASK_KEY);
     return raw ? (JSON.parse(raw) as Task[]) : [];
@@ -81,10 +88,12 @@ export function getTasks(): Task[] {
 }
 
 export function setTasks(tasks: Task[]) {
+  if (typeof window === "undefined") return;
   localStorage.setItem(TASK_KEY, JSON.stringify(tasks));
 }
 
 export function getExpenses(): Expense[] {
+  if (typeof window === "undefined") return [];
   try {
     const raw = localStorage.getItem(EXP_KEY);
     return raw ? (JSON.parse(raw) as Expense[]) : [];
@@ -94,6 +103,7 @@ export function getExpenses(): Expense[] {
 }
 
 export function setExpenses(expenses: Expense[]) {
+  if (typeof window === "undefined") return;
   localStorage.setItem(EXP_KEY, JSON.stringify(expenses));
 }
 

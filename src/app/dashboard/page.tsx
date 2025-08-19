@@ -9,9 +9,9 @@ export default function DashboardHome() {
   const now = new Date();
   const month = now.getMonth() + 1;
   const year = now.getFullYear();
-  const clients = getClients();
-  const entries = getTimeEntries();
-  const gstReg = getGSTRegistered();
+  const clients = typeof window !== "undefined" ? getClients() : [];
+  const entries = typeof window !== "undefined" ? getTimeEntries() : [];
+  const gstReg = typeof window !== "undefined" ? getGSTRegistered() : false;
 
   const invoices = clients.map((c) => aggregateMonthlyInvoice(c, entries, gstReg, month, year));
   const kpiRevenue = invoices.reduce((s, i) => s + i.total, 0);

@@ -10,10 +10,10 @@ function toCurrency(n: number) {
 
 export default function TaxOverviewPage() {
   // Aggregate automatically from clients/time/expenses, but let user tweak
-  const clients = getClients();
-  const entries = getTimeEntries();
-  const initialGstReg = getGSTRegistered();
-  const exp = getExpenses();
+  const clients = typeof window !== "undefined" ? getClients() : [];
+  const entries = typeof window !== "undefined" ? getTimeEntries() : [];
+  const initialGstReg = typeof window !== "undefined" ? getGSTRegistered() : false;
+  const exp = typeof window !== "undefined" ? getExpenses() : [];
   const now = new Date();
   const m = now.getMonth() + 1;
   const y = now.getFullYear();

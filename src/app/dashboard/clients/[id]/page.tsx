@@ -14,15 +14,15 @@ export default function ClientDetailPage() {
   const id = params?.id;
   const [tasks, setTasksState] = useState<Task[]>([]);
 
-  const client = useMemo(() => getClients().find((c) => c.id === id), [id]);
-  const entries = useMemo(() => getTimeEntries().filter((t) => t.clientId === id), [id]);
+  const client = useMemo(() => (typeof window !== "undefined" ? getClients().find((c) => c.id === id) : undefined), [id]);
+  const entries = useMemo(() => (typeof window !== "undefined" ? getTimeEntries().filter((t) => t.clientId === id) : []), [id]);
 
   useEffect(() => {
-    setTasksState(getTasks().filter((t) => t.clientId === id));
+    if (typeof window !== "undefined") setTasksState(getTasks().filter((t) => t.clientId === id));
   }, [id]);
 
   useEffect(() => {
-    setTasks(tasks);
+    if (typeof window !== "undefined") setTasks(tasks);
   }, [tasks]);
 
   const totalHours = Math.round(entries.reduce((s, e) => s + e.hours, 0) * 10) / 10;
