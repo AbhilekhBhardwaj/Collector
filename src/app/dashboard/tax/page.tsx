@@ -12,7 +12,7 @@ export default function TaxOverviewPage() {
   // Aggregate automatically from clients/time/expenses, but let user tweak
   const clients = getClients();
   const entries = getTimeEntries();
-  const gstReg = getGSTRegistered();
+  const initialGstReg = getGSTRegistered();
   const exp = getExpenses();
   const now = new Date();
   const m = now.getMonth() + 1;
@@ -44,7 +44,7 @@ export default function TaxOverviewPage() {
   const [exports, setExports] = useState(exportRevenue);
   const [expenses, setExpenses] = useState(monthlyExpenses);
   const [specialCat, setSpecialCat] = useState(false);
-  const [gstReg, setGstReg] = useState(false);
+  const [gstRegistered, setGstRegistered] = useState(initialGstReg);
 
   const summary = useMemo(() =>
     getTaxSummary({
@@ -54,8 +54,8 @@ export default function TaxOverviewPage() {
       totalExpenses: expenses,
       paymentsByClient: clients.map((c) => ({ clientId: c.name, amount: (c.billingModel === "Monthly" || c.billingModel === "Project") ? c.amount : entries.filter((t) => t.clientId === c.id).reduce((s, t) => s + Math.round(t.hours * t.rate), 0) })),
       specialCategoryState: specialCat,
-      isGSTRegistered: gstReg,
-    }), [gross, domestic, exports, expenses, specialCat, gstReg]);
+      isGSTRegistered: gstRegistered,
+    }), [gross, domestic, exports, expenses, specialCat, gstRegistered]);
 
   return (
     <div>
@@ -86,7 +86,7 @@ export default function TaxOverviewPage() {
         </div>
         <div className="flex items-center gap-3">
           <label className="text-sm">GST registered?</label>
-          <input type="checkbox" checked={gstReg} onChange={(e) => setGstReg(e.target.checked)} />
+          <input type="checkbox" checked={gstRegistered} onChange={(e) => setGstRegistered(e.target.checked)} />
         </div>
       </div>
 
