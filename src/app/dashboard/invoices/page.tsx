@@ -1,71 +1,55 @@
 "use client";
 
 import { useMemo, useState } from "react";
-
-type Invoice = {
-  id: string;
-  client: string;
-  date: string;
-  items: { description: string; hours: number; rate: number }[];
-  paid: boolean;
-};
+import { aggregateMonthlyInvoice } from "@/lib/invoice";
+import MiniBar from "@/components/MiniBar";
+import { getClients, getGSTRegistered, getTimeEntries } from "@/lib/store";
 
 function toCurrency(n: number) {
   return new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(n);
 }
 
 export default function InvoicesPage() {
-  const [invoices, setInvoices] = useState<Invoice[]>([]);
-  const [client, setClient] = useState("");
-  const [itemDesc, setItemDesc] = useState("");
-  const [hours, setHours] = useState(1);
-  const [rate, setRate] = useState(1500);
+  const [month, setMonth] = useState(new Date().getMonth() + 1);
+  const [year, setYear] = useState(new Date().getFullYear());
 
-  function addItem() {
-    if (!client || !itemDesc) return;
-    const id = crypto.randomUUID();
-    setInvoices((arr) => [
-      {
-        id,
-        client,
-        date: new Date().toISOString().slice(0, 10),
-        items: [{ description: itemDesc, hours, rate }],
-        paid: false,
-      },
-      ...arr,
-    ]);
-    setItemDesc("");
-  }
+  const data = useMemo(() => {
+    const clients = getClients();
+    const entries = getTimeEntries();
+    const gstRegistered = getGSTRegistered();
+    return clients.map((c) => aggregateMonthlyInvoice(c, entries, gstRegistered, month, year));
+  }, [month, year]);
 
-  function total(inv: Invoice) {
-    return inv.items.reduce((s, it) => s + it.hours * it.rate, 0);
+  const grand = useMemo(() => data.reduce((acc, inv) => {
+    acc.subtotal += inv.subtotal;
+    acc.gst += inv.gst;
+    acc.tds += inv.tds;
+    acc.total += inv.total;
+    return acc;
+  }, { subtotal: 0, gst: 0, tds: 0, total: 0 }), [data]);
+
+  function openPrintable(invId: string) {
+    window.open(`/dashboard/invoices/${invId}/print`, "_blank");
   }
 
   return (
     <div>
       <h1 className="text-2xl font-bold">Invoices</h1>
       <div className="mt-4 grid gap-4 sm:grid-cols-4">
-        <div className="grid gap-2">
-          <label className="text-sm">Client</label>
-          <input value={client} onChange={(e) => setClient(e.target.value)} className="h-10 rounded-md border border-black/10 dark:border-white/15 bg-transparent px-3" placeholder="Client name" />
-        </div>
-        <div className="grid gap-2 sm:col-span-2">
-          <label className="text-sm">Item</label>
-          <input value={itemDesc} onChange={(e) => setItemDesc(e.target.value)} className="h-10 rounded-md border border-black/10 dark:border-white/15 bg-transparent px-3" placeholder="Work description" />
-        </div>
-        <div className="grid grid-cols-2 gap-2">
-          <div className="grid gap-2">
-            <label className="text-sm">Hours</label>
-            <input type="number" value={hours} onChange={(e) => setHours(parseFloat(e.target.value) || 0)} className="h-10 rounded-md border border-black/10 dark:border-white/15 bg-transparent px-3" />
-          </div>
-          <div className="grid gap-2">
-            <label className="text-sm">Rate (₹/hr)</label>
-            <input type="number" value={rate} onChange={(e) => setRate(parseFloat(e.target.value) || 0)} className="h-10 rounded-md border border-black/10 dark:border-white/15 bg-transparent px-3" />
-          </div>
+        <div className="rounded-xl border border-black/10 dark:border-white/10 p-5 sm:col-span-2">
+          <div className="text-sm text-black/60 dark:text-white/60">Totals composition</div>
+          <MiniBar className="mt-3" values={[grand.subtotal, grand.gst, grand.tds, grand.total]} labels={["Subt","GST","TDS","Total"]} />
         </div>
       </div>
-      <div className="mt-3">
-        <button onClick={addItem} className="h-10 px-4 rounded-md bg-indigo-600 text-white">Create Invoice</button>
+      <div className="mt-4 flex items-center gap-3">
+        <label className="text-sm">Month</label>
+        <select value={month} onChange={(e) => setMonth(parseInt(e.target.value))} className="h-10 rounded-md border border-black/10 dark:border-white/15 bg-transparent px-3">
+          {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
+            <option key={m} value={m}>{m}</option>
+          ))}
+        </select>
+        <label className="text-sm">Year</label>
+        <input type="number" value={year} onChange={(e) => setYear(parseInt(e.target.value) || year)} className="h-10 w-24 rounded-md border border-black/10 dark:border-white/15 bg-transparent px-3" />
       </div>
 
       <div className="mt-6 overflow-x-auto">
@@ -73,26 +57,40 @@ export default function InvoicesPage() {
           <thead className="text-left border-b border-black/10 dark:border-white/10">
             <tr>
               <th className="py-2 pr-4">Client</th>
-              <th className="py-2 pr-4">Date</th>
               <th className="py-2 pr-4">Items</th>
+              <th className="py-2 pr-4">Subtotal</th>
+              <th className="py-2 pr-4">GST</th>
+              <th className="py-2 pr-4">TDS</th>
               <th className="py-2 pr-4">Total</th>
               <th className="py-2 pr-4">Actions</th>
             </tr>
           </thead>
           <tbody>
-            {invoices.map((inv) => (
-              <tr key={inv.id} className="border-b border-black/5 dark:border-white/5">
-                <td className="py-2 pr-4">{inv.client}</td>
-                <td className="py-2 pr-4">{inv.date}</td>
-                <td className="py-2 pr-4">{inv.items.map((i) => `${i.description} (${i.hours}h × ₹${i.rate})`).join(", ")}</td>
-                <td className="py-2 pr-4">{toCurrency(total(inv))}</td>
+            {data.map((inv) => (
+              <tr key={`${inv.clientId}-${month}-${year}`} className="border-b border-black/5 dark:border-white/5">
+                <td className="py-2 pr-4 font-medium">{inv.clientName}</td>
+                <td className="py-2 pr-4">{inv.items.length > 0 ? inv.items.map((i) => `${i.description} (${i.hours}h × ₹${i.rate})`).join(", ") : "Monthly retainer"}</td>
+                <td className="py-2 pr-4">{toCurrency(inv.subtotal)}</td>
+                <td className="py-2 pr-4">{toCurrency(inv.gst)}</td>
+                <td className="py-2 pr-4">{toCurrency(inv.tds)}</td>
+                <td className="py-2 pr-4 font-semibold">{toCurrency(inv.total)}</td>
                 <td className="py-2 pr-4 flex gap-2">
-                  <button className="px-3 h-8 rounded-md border">Export PDF</button>
+                  <button onClick={() => openPrintable(`${inv.clientId}-${month}-${year}`)} className="px-3 h-8 rounded-md border">Print</button>
                   <button className="px-3 h-8 rounded-md border">Mark Paid</button>
                 </td>
               </tr>
             ))}
           </tbody>
+          <tfoot>
+            <tr>
+              <td className="py-2 pr-4 font-semibold" colSpan={2}>Grand Total</td>
+              <td className="py-2 pr-4 font-semibold">{toCurrency(grand.subtotal)}</td>
+              <td className="py-2 pr-4 font-semibold">{toCurrency(grand.gst)}</td>
+              <td className="py-2 pr-4 font-semibold">{toCurrency(grand.tds)}</td>
+              <td className="py-2 pr-4 font-semibold">{toCurrency(grand.total)}</td>
+              <td />
+            </tr>
+          </tfoot>
         </table>
       </div>
     </div>

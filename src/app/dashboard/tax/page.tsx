@@ -2,16 +2,47 @@
 
 import { useMemo, useState } from "react";
 import { getTaxSummary } from "@/lib/tax";
+import { getClients, getExpenses, getGSTRegistered, getTimeEntries } from "@/lib/store";
 
 function toCurrency(n: number) {
   return new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(n);
 }
 
 export default function TaxOverviewPage() {
-  const [gross, setGross] = useState(12_00_000);
-  const [domestic, setDomestic] = useState(10_00_000);
-  const [exports, setExports] = useState(2_00_000);
-  const [expenses, setExpenses] = useState(2_50_000);
+  // Aggregate automatically from clients/time/expenses, but let user tweak
+  const clients = getClients();
+  const entries = getTimeEntries();
+  const gstReg = getGSTRegistered();
+  const exp = getExpenses();
+  const now = new Date();
+  const m = now.getMonth() + 1;
+  const y = now.getFullYear();
+  const monthlyRevenue = clients.reduce((sum, c) => {
+    if (c.billingModel === "Monthly" || c.billingModel === "Project") return sum + c.amount;
+    const monthSum = entries.filter((t) => t.clientId === c.id).filter((t) => {
+      const d = new Date(t.date + "T00:00:00");
+      return d.getMonth() + 1 === m && d.getFullYear() === y;
+    }).reduce((s, t) => s + Math.round(t.hours * t.rate), 0);
+    return sum + monthSum;
+  }, 0);
+  const domesticRevenue = clients.filter((c) => c.domestic).reduce((sum, c) => {
+    if (c.billingModel === "Monthly" || c.billingModel === "Project") return sum + c.amount;
+    const monthSum = entries.filter((t) => t.clientId === c.id).filter((t) => {
+      const d = new Date(t.date + "T00:00:00");
+      return d.getMonth() + 1 === m && d.getFullYear() === y;
+    }).reduce((s, t) => s + Math.round(t.hours * t.rate), 0);
+    return sum + monthSum;
+  }, 0);
+  const exportRevenue = monthlyRevenue - domesticRevenue;
+  const monthlyExpenses = exp.filter((e) => {
+    const d = new Date(e.date + "T00:00:00");
+    return d.getMonth() + 1 === m && d.getFullYear() === y;
+  }).reduce((s, e) => s + e.amount, 0);
+
+  const [gross, setGross] = useState(monthlyRevenue);
+  const [domestic, setDomestic] = useState(domesticRevenue);
+  const [exports, setExports] = useState(exportRevenue);
+  const [expenses, setExpenses] = useState(monthlyExpenses);
   const [specialCat, setSpecialCat] = useState(false);
   const [gstReg, setGstReg] = useState(false);
 
@@ -21,10 +52,7 @@ export default function TaxOverviewPage() {
       domesticReceipts: domestic,
       exportReceipts: exports,
       totalExpenses: expenses,
-      paymentsByClient: [
-        { clientId: "Alpha Ltd.", amount: 45_000 },
-        { clientId: "Beta LLC", amount: 1_80_000 },
-      ],
+      paymentsByClient: clients.map((c) => ({ clientId: c.name, amount: (c.billingModel === "Monthly" || c.billingModel === "Project") ? c.amount : entries.filter((t) => t.clientId === c.id).reduce((s, t) => s + Math.round(t.hours * t.rate), 0) })),
       specialCategoryState: specialCat,
       isGSTRegistered: gstReg,
     }), [gross, domestic, exports, expenses, specialCat, gstReg]);
@@ -32,7 +60,7 @@ export default function TaxOverviewPage() {
   return (
     <div>
       <h1 className="text-2xl font-bold">Tax Overview</h1>
-      <p className="mt-1 text-black/70 dark:text-white/70">Auto-calculated GST, simulated TDS, and income tax (new regime). Suggests Section 44ADA when beneficial.</p>
+      <p className="mt-1 text-black/70 dark:text-white/70">Monthly estimates auto-filled from clients, work entries, and expenses. Edit values if needed.</p>
 
       <div className="mt-4 grid gap-4 sm:grid-cols-3">
         <div className="grid gap-2">
@@ -50,6 +78,7 @@ export default function TaxOverviewPage() {
         <div className="grid gap-2">
           <label className="text-sm">Expenses (deductible)</label>
           <input type="number" value={expenses} onChange={(e) => setExpenses(parseFloat(e.target.value) || 0)} className="h-10 rounded-md border border-black/10 dark:border-white/15 bg-transparent px-3" />
+          <a href="/dashboard/expenses" className="text-xs underline text-black/60 dark:text-white/60">Add expenses →</a>
         </div>
         <div className="flex items-center gap-3">
           <label className="text-sm">Special category state?</label>

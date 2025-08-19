@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import MiniBar from "@/components/MiniBar";
 
 type TimerEntry = {
   id: string;
@@ -69,6 +70,26 @@ export default function TimeTrackerPage() {
     }, 0);
   }, [entries]);
 
+  const weekBars = useMemo(() => {
+    const dayMs: number[] = Array(7).fill(0);
+    const base = new Date(today);
+    const day = today.getDay();
+    base.setDate(today.getDate() - ((day + 6) % 7));
+    base.setHours(0, 0, 0, 0);
+    for (const e of entries) {
+      const s = new Date(e.startedAt);
+      const idx = Math.floor((s.getTime() - base.getTime()) / (24 * 3600 * 1000));
+      if (idx >= 0 && idx < 7) {
+        const end = e.stoppedAt ?? Date.now();
+        dayMs[idx] += Math.max(0, end - e.startedAt);
+      }
+    }
+    // convert ms to hours with one decimal
+    const hours = dayMs.map((ms) => Math.round((ms / 3600000) * 10) / 10);
+    const labels = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+    return { hours, labels };
+  }, [entries]);
+
   return (
     <div>
       <h1 className="text-2xl font-bold">Time Tracker</h1>
@@ -99,7 +120,7 @@ export default function TimeTrackerPage() {
         <div className="rounded-xl border border-black/10 dark:border-white/10 p-5">
           <div className="text-sm text-black/60 dark:text-white/60">This week</div>
           <div className="mt-1 text-2xl font-semibold">{formatDuration(weeklyMs)}</div>
-          <div className="mt-4 h-24 rounded-md bg-gradient-to-tr from-indigo-500/20 to-emerald-400/20" />
+          <MiniBar className="mt-4" values={weekBars.hours} labels={weekBars.labels} />
         </div>
       </div>
 
