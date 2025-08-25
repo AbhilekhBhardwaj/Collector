@@ -22,14 +22,12 @@ export default function Home() {
           </div>
           <nav className="hidden md:flex items-center gap-8 text-sm">
             <a href="#features" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition">Features</a>
-            <a href="#how" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition">How it works</a>
-            <a href="#pricing" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition">Pricing</a>
-            <a href="#testimonials" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition">Testimonials</a>
+            <a href="#about" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition">About</a>
             <a href="#contact" className="hover:text-indigo-600 dark:hover:text-indigo-400 transition">Contact</a>
           </nav>
           <div className="flex items-center gap-2">
-            <Link href="/dashboard" className="hidden sm:inline-flex h-9 items-center rounded-md bg-indigo-600 px-4 text-white hover:bg-indigo-500 transition">Start Free</Link>
-            <a href="#demo" className="hidden sm:inline-flex h-9 items-center rounded-md border border-black/10 dark:border-white/15 px-4 hover:bg-black/5 dark:hover:bg-white/10 transition">Demo Tour</a>
+            <a href="#demo" className="hidden sm:inline-flex h-9 items-center rounded-md border border-black/10 dark:border-white/15 px-4 hover:bg-black/5 dark:hover:bg-white/10 transition">Demo</a>
+            <a href="/login" className="hidden sm:inline-flex h-9 items-center rounded-md bg-indigo-600 px-4 text-white hover:bg-indigo-500 transition">Sign In</a>
             <button onClick={() => document.documentElement.classList.toggle("dark") || localStorage.setItem("theme", document.documentElement.classList.contains("dark") ? "dark" : "light")} aria-label="Toggle theme" className="ml-1 inline-flex h-9 w-9 items-center justify-center rounded-md border border-black/10 dark:border-white/15 hover:bg-black/5 dark:hover:bg-white/10">
               <span className="hidden dark:inline">☀️</span>
               <span className="dark:hidden">🌙</span>
@@ -39,14 +37,13 @@ export default function Home() {
         </div>
         {menuOpen && (
           <div className="md:hidden border-t border-black/5 dark:border-white/10">
-            <div className="px-4 py-3 flex flex-col gap-3 text-sm">
-              <a href="#features">Features</a>
-              <a href="#how">How it works</a>
-              <a href="#pricing">Pricing</a>
-              <a href="#testimonials">Testimonials</a>
-              <a href="#contact">Contact</a>
-              <Link href="/dashboard" className="h-9 inline-flex items-center justify-center rounded-md bg-indigo-600 px-4 text-white">Start Free</Link>
-            </div>
+                          <div className="px-4 py-3 flex flex-col gap-3 text-sm">
+                <a href="#features">Features</a>
+                <a href="#about">About</a>
+                <a href="#contact">Contact</a>
+                <a href="#demo" className="h-9 inline-flex items-center justify-center rounded-md bg-indigo-600 px-4 text-white">Demo</a>
+                <a href="/login" className="h-9 inline-flex items-center justify-center rounded-md bg-indigo-600 px-4 text-white">Sign In</a>
+              </div>
           </div>
         )}
       </header>
@@ -58,134 +55,125 @@ export default function Home() {
             <div className="absolute -top-40 left-1/2 h-[480px] w-[680px] -translate-x-1/2 rounded-full bg-gradient-to-b from-indigo-500/60 via-sky-400/60 to-emerald-400/60 blur-3xl" />
           </div>
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20 sm:py-28">
-            <div className="grid md:grid-cols-2 gap-10 items-center">
-              <div>
-                <h1 className="text-4xl sm:text-5xl font-bold tracking-tight">Track time. Invoice smart. Calculate your taxes.</h1>
-                <p className="mt-4 text-lg text-black/70 dark:text-white/70">All-in-one dashboard for productivity & compliance.</p>
-                <div className="mt-8 flex flex-wrap gap-3">
-                  <Link href="/dashboard" className="inline-flex h-11 items-center rounded-md bg-indigo-600 px-6 text-white hover:bg-indigo-500 transition">Start Free</Link>
-                  <a href="#demo" className="inline-flex h-11 items-center rounded-md border border-black/10 dark:border-white/15 px-6 hover:bg-black/5 dark:hover:bg-white/10 transition">Demo Tour</a>
-                </div>
-                <div className="mt-6 text-sm text-black/60 dark:text-white/60">No credit card required</div>
-              </div>
-              <div className="relative">
-                <div className="rounded-xl border border-black/10 dark:border-white/10 bg-white/60 dark:bg-black/30 backdrop-blur shadow-sm p-4">
-                  <div className="h-6 w-24 rounded-full bg-indigo-100 dark:bg-indigo-900/40" />
-                  <div className="mt-3 grid grid-cols-3 gap-3">
-                    <div className="rounded-lg border border-black/10 dark:border-white/10 p-4">
-                      <div className="text-sm text-black/60 dark:text-white/60">Today</div>
-                      <div className="mt-1 text-2xl font-semibold">5h 12m</div>
-                    </div>
-                    <div className="rounded-lg border border-black/10 dark:border-white/10 p-4">
-                      <div className="text-sm text-black/60 dark:text-white/60">Invoices</div>
-                      <div className="mt-1 text-2xl font-semibold">₹38k</div>
-                    </div>
-                    <div className="rounded-lg border border-black/10 dark:border-white/10 p-4">
-                      <div className="text-sm text-black/60 dark:text-white/60">GST</div>
-                      <div className="mt-1 text-2xl font-semibold">18%</div>
-                    </div>
-                  </div>
-                  <div className="mt-4 h-28 rounded-md bg-gradient-to-tr from-indigo-500/20 to-emerald-400/20" />
-                </div>
+            <div className="text-center max-w-4xl mx-auto">
+              <h1 className="text-4xl sm:text-6xl font-bold tracking-tight">Simple. Powerful. Beautiful.</h1>
+              <p className="mt-6 text-xl text-black/70 dark:text-white/70">A modern app designed for the way you work.</p>
+              <div className="mt-10 flex flex-wrap gap-4 justify-center">
+                <a href="/login" className="inline-flex h-12 items-center rounded-lg bg-indigo-600 px-8 text-white hover:bg-indigo-500 transition text-lg">Get Started</a>
+                <a href="#features" className="inline-flex h-12 items-center rounded-lg border border-black/10 dark:border-white/15 px-8 hover:bg-black/5 dark:hover:bg-white/10 transition text-lg">Learn More</a>
               </div>
             </div>
           </div>
         </section>
 
         {/* Features */}
-        <section id="features" className="py-16 sm:py-20">
+        <section id="features" className="py-20 sm:py-28">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <h2 className="text-2xl sm:text-3xl font-bold">Everything you need</h2>
-            <p className="mt-2 text-black/70 dark:text-white/70">Time Tracking, Invoicing, Tax Estimate (GST, TDS, Income Tax), Expense Management, Export & Reports.</p>
-            <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl sm:text-4xl font-bold">Everything you need</h2>
+              <p className="mt-4 text-lg text-black/70 dark:text-white/70">Built with modern technologies and designed for simplicity.</p>
+            </div>
+            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
               {[
-                { t: "Time Tracking", d: "Start/stop timers, tag projects, and see daily/weekly stats." },
-                { t: "Invoicing", d: "Create professional invoices and export to PDF." },
-                { t: "Tax Estimate", d: "Auto-calc GST, TDS, and income tax with India rules." },
-                { t: "Expense Management", d: "Track expenses and auto-calc deductions." },
-                { t: "Reports", d: "Export CSV/PDF summaries for your CA." },
-                { t: "Dark Mode", d: "Futuristic yet friendly design with smooth animations." },
-              ].map((f) => (
-                <div key={f.t} className="rounded-xl border border-black/10 dark:border-white/10 p-6 hover:shadow-sm transition">
-                  <div className="text-lg font-semibold">{f.t}</div>
-                  <div className="mt-2 text-sm text-black/70 dark:text-white/70">{f.d}</div>
+                { 
+                  title: "Modern Design", 
+                  description: "Clean, intuitive interface that adapts to your preferences.",
+                  icon: "🎨"
+                },
+                { 
+                  title: "Fast Performance", 
+                  description: "Lightning-fast loading times and smooth interactions.",
+                  icon: "⚡"
+                },
+                { 
+                  title: "Responsive", 
+                  description: "Works perfectly on desktop, tablet, and mobile devices.",
+                  icon: "📱"
+                },
+                { 
+                  title: "Dark Mode", 
+                  description: "Beautiful dark theme that's easy on your eyes.",
+                  icon: "🌙"
+                },
+                { 
+                  title: "Accessible", 
+                  description: "Built with accessibility in mind for all users.",
+                  icon: "♿"
+                },
+                { 
+                  title: "Open Source", 
+                  description: "Transparent, customizable, and community-driven.",
+                  icon: "🔓"
+                },
+              ].map((feature) => (
+                <div key={feature.title} className="text-center p-8 rounded-2xl border border-black/10 dark:border-white/10 hover:shadow-lg transition-all duration-300 hover:scale-105">
+                  <div className="text-4xl mb-4">{feature.icon}</div>
+                  <h3 className="text-xl font-semibold mb-3">{feature.title}</h3>
+                  <p className="text-black/70 dark:text-white/70">{feature.description}</p>
                 </div>
               ))}
             </div>
           </div>
         </section>
 
-        {/* How It Works */}
-        <section id="how" className="py-16 sm:py-20 bg-black/[.03] dark:bg-white/[.03]">
+        {/* About */}
+        <section id="about" className="py-20 sm:py-28 bg-black/[.03] dark:bg-white/[.03]">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <h2 className="text-2xl sm:text-3xl font-bold">How it works</h2>
-            <div className="mt-8 grid sm:grid-cols-3 gap-6">
-              {[
-                { s: "Track Time", d: "Run a timer while you work." },
-                { s: "Generate Invoice", d: "Convert hours to invoices in one click." },
-                { s: "Get Tax Summary", d: "See GST, TDS, and income tax instantly." },
-              ].map((step, i) => (
-                <div key={step.s} className="rounded-xl border border-black/10 dark:border-white/10 p-6">
-                  <div className="text-sm text-black/60 dark:text-white/60">Step {i + 1}</div>
-                  <div className="mt-1 text-lg font-semibold">{step.s}</div>
-                  <div className="mt-1 text-sm text-black/70 dark:text-white/70">{step.d}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Pricing */}
-        <section id="pricing" className="py-16 sm:py-20">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <h2 className="text-2xl sm:text-3xl font-bold">Simple pricing</h2>
-            <div className="mt-8 grid gap-6 sm:grid-cols-3">
-              {[
-                { name: "Free", price: "₹0", desc: "Basic tracking", highlight: false, cta: "Get started" },
-                { name: "Pro", price: "₹299/mo", desc: "Everything you need", highlight: true, cta: "Start Pro" },
-                { name: "Business", price: "₹699/mo", desc: "Teams & reports", highlight: false, cta: "Choose Business" },
-              ].map((p) => (
-                <div key={p.name} className={`rounded-2xl border p-6 ${p.highlight ? "border-indigo-500 shadow-[0_0_0_4px_rgba(99,102,241,0.15)]" : "border-black/10 dark:border-white/10"}`}>
-                  <div className="flex items-baseline gap-2">
-                    <div className="text-xl font-semibold">{p.name}</div>
-                    {p.highlight && <span className="rounded-full bg-indigo-600/10 text-indigo-700 dark:text-indigo-300 px-2 py-0.5 text-xs">Most popular</span>}
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
+              <div>
+                <h2 className="text-3xl sm:text-4xl font-bold mb-6">Built for the future</h2>
+                <p className="text-lg text-black/70 dark:text-white/70 mb-6">
+                  Collector is designed to be simple yet powerful. We believe that great software should be intuitive, fast, and beautiful.
+                </p>
+                <p className="text-lg text-black/70 dark:text-white/70 mb-8">
+                  Whether you're a developer, designer, or just someone who appreciates well-crafted tools, Collector has something for you.
+                </p>
+                <div className="flex flex-wrap gap-4">
+                  <div className="flex items-center gap-2 text-sm text-black/60 dark:text-white/60">
+                    <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                    Next.js 14
                   </div>
-                  <div className="mt-2 text-3xl font-bold">{p.price}</div>
-                  <div className="mt-2 text-sm text-black/70 dark:text-white/70">{p.desc}</div>
-                  <a href="#signup" className={`mt-6 inline-flex h-10 items-center justify-center rounded-md px-4 ${p.highlight ? "bg-indigo-600 text-white hover:bg-indigo-500" : "border border-black/10 dark:border-white/15 hover:bg-black/5 dark:hover:bg-white/10"}`}>{p.cta}</a>
+                  <div className="flex items-center gap-2 text-sm text-black/60 dark:text-white/60">
+                    <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                    TypeScript
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-black/60 dark:text-white/60">
+                    <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
+                    Tailwind CSS
+                  </div>
                 </div>
-              ))}
+              </div>
+              <div className="relative">
+                <div className="rounded-2xl border border-black/10 dark:border-white/10 bg-white/60 dark:bg-black/30 backdrop-blur shadow-lg p-8">
+                  <div className="space-y-4">
+                    <div className="h-4 w-32 rounded-full bg-indigo-100 dark:bg-indigo-900/40"></div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="rounded-lg border border-black/10 dark:border-white/10 p-4">
+                        <div className="text-sm text-black/60 dark:text-white/60">Users</div>
+                        <div className="mt-1 text-2xl font-semibold">10k+</div>
+                      </div>
+                      <div className="rounded-lg border border-black/10 dark:border-white/10 p-4">
+                        <div className="text-sm text-black/60 dark:text-white/60">Countries</div>
+                        <div className="mt-1 text-2xl font-semibold">50+</div>
+                      </div>
+                    </div>
+                    <div className="h-32 rounded-lg bg-gradient-to-tr from-indigo-500/20 to-emerald-400/20"></div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
 
-        {/* Testimonials */}
-        <section id="testimonials" className="py-16 sm:py-20 bg-black/[.03] dark:bg-white/[.03]">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <h2 className="text-2xl sm:text-3xl font-bold">Loved by freelancers</h2>
-            <div className="mt-8 grid gap-6 sm:grid-cols-3">
-              {[
-                { q: "Collector makes taxes feel effortless.", a: "Ananya, Designer" },
-                { q: "I invoice faster and get paid sooner.", a: "Rohit, Developer" },
-                { q: "Peace of mind during filings.", a: "Sana, Consultant" },
-              ].map((t) => (
-                <div key={t.a} className="rounded-xl border border-black/10 dark:border-white/10 p-6">
-                  <div className="text-sm">“{t.q}”</div>
-                  <div className="mt-3 text-sm text-black/60 dark:text-white/60">— {t.a}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* CTA Banner */}
-        <section className="py-16 sm:py-20">
+        {/* CTA */}
+        <section className="py-20 sm:py-28">
           <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-            <div className="rounded-2xl border border-indigo-500/50 bg-indigo-600/10 p-8 text-center">
-              <h3 className="text-2xl font-semibold">Ready to streamline your freelance workflow?</h3>
-              <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
-                <Link href="/dashboard" className="inline-flex h-11 items-center rounded-md bg-indigo-600 px-6 text-white hover:bg-indigo-500 transition">Sign Up Free</Link>
-                <a href="#demo" className="inline-flex h-11 items-center rounded-md border border-black/10 dark:border-white/15 px-6 hover:bg-black/5 dark:hover:bg-white/10 transition">Demo Tour</a>
+            <div className="rounded-3xl border border-indigo-500/50 bg-indigo-600/10 p-12 text-center">
+              <h3 className="text-3xl font-bold mb-4">Ready to get started?</h3>
+              <p className="text-lg text-black/70 dark:text-white/70 mb-8">Join thousands of users who trust Collector for their daily workflow.</p>
+              <div className="flex flex-wrap items-center justify-center gap-4">
+                <a href="/login" className="inline-flex h-12 items-center rounded-lg bg-indigo-600 px-8 text-white hover:bg-indigo-500 transition text-lg">Get Started</a>
+                <a href="#contact" className="inline-flex h-12 items-center rounded-lg border border-black/10 dark:border-white/15 px-8 hover:bg-black/5 dark:hover:bg-white/10 transition text-lg">Contact Us</a>
               </div>
             </div>
           </div>
@@ -193,25 +181,45 @@ export default function Home() {
       </main>
 
       {/* Footer */}
-      <footer id="contact" className="border-t border-black/5 dark:border-white/10 py-10">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-3">
-            <div className="h-8 w-8 rounded-md bg-gradient-to-br from-indigo-500 via-sky-500 to-emerald-500" />
-            <span className="font-semibold">Collector</span>
+      <footer id="contact" className="border-t border-black/5 dark:border-white/10 py-12">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+            <div>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="h-8 w-8 rounded-md bg-gradient-to-br from-indigo-500 via-sky-500 to-emerald-500" />
+                <span className="font-semibold text-lg">Collector</span>
+              </div>
+              <p className="text-black/70 dark:text-white/70">Simple, powerful, and beautiful software for modern workflows.</p>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-4">Product</h4>
+              <div className="space-y-2 text-sm">
+                <a href="#features" className="block text-black/70 dark:text-white/70 hover:text-black dark:hover:text-white">Features</a>
+                <a href="#demo" className="block text-black/70 dark:text-white/70 hover:text-black dark:hover:text-white">Demo</a>
+                <a href="#" className="block text-black/70 dark:text-white/70 hover:text-black dark:hover:text-white">Documentation</a>
+              </div>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-4">Company</h4>
+              <div className="space-y-2 text-sm">
+                <a href="#about" className="block text-black/70 dark:text-white/70 hover:text-black dark:hover:text-white">About</a>
+                <a href="#contact" className="block text-black/70 dark:text-white/70 hover:text-black dark:hover:text-white">Contact</a>
+                <a href="#" className="block text-black/70 dark:text-white/70 hover:text-black dark:hover:text-white">Blog</a>
+              </div>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-4">Connect</h4>
+              <div className="space-y-2 text-sm">
+                <a href="#" className="block text-black/70 dark:text-white/70 hover:text-black dark:hover:text-white">Twitter</a>
+                <a href="#" className="block text-black/70 dark:text-white/70 hover:text-black dark:hover:text-white">GitHub</a>
+                <a href="#" className="block text-black/70 dark:text-white/70 hover:text-black dark:hover:text-white">Discord</a>
+              </div>
+            </div>
           </div>
-          <nav className="flex items-center gap-6 text-sm">
-            <a href="#features">Features</a>
-            <a href="#pricing">Pricing</a>
-            <a href="#">Docs</a>
-            <a href="#contact">Contact</a>
-          </nav>
-          <div className="flex items-center gap-4 text-xl">
-            <a aria-label="X" href="#">𝕏</a>
-            <a aria-label="LinkedIn" href="#">in</a>
-            <a aria-label="GitHub" href="#">GH</a>
+          <div className="border-t border-black/5 dark:border-white/10 pt-8 text-center">
+            <p className="text-sm text-black/60 dark:text-white/50">© {new Date().getFullYear()} Collector. All rights reserved.</p>
           </div>
         </div>
-        <div className="mt-6 text-center text-xs text-black/60 dark:text-white/50">© {new Date().getFullYear()} Collector. All rights reserved.</div>
       </footer>
     </div>
   );

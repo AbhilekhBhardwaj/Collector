@@ -1,79 +1,177 @@
 "use client";
 
-import Link from "next/link";
-import MiniBar from "@/components/MiniBar";
-import { getClients, getGSTRegistered, getTimeEntries } from "@/lib/store";
-import { aggregateMonthlyInvoice } from "@/lib/invoice";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { signOut } from "next-auth/react";
 
-export default function DashboardHome() {
-  const now = new Date();
-  const month = now.getMonth() + 1;
-  const year = now.getFullYear();
-  const clients = typeof window !== "undefined" ? getClients() : [];
-  const entries = typeof window !== "undefined" ? getTimeEntries() : [];
-  const gstReg = typeof window !== "undefined" ? getGSTRegistered() : false;
+export default function DashboardPage() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
+  const [userData, setUserData] = useState<any>(null);
 
-  const invoices = clients.map((c) => aggregateMonthlyInvoice(c, entries, gstReg, month, year));
-  const kpiRevenue = invoices.reduce((s, i) => s + i.total, 0);
-  const kpiGST = invoices.reduce((s, i) => s + i.gst, 0);
-  const kpiTDS = invoices.reduce((s, i) => s + i.tds, 0);
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/login");
+    }
+  }, [status, router]);
 
-  // Week bars from time entries
-  const dayMs: number[] = Array(7).fill(0);
-  const base = new Date(now);
-  const day = now.getDay();
-  base.setDate(now.getDate() - ((day + 6) % 7));
-  base.setHours(0, 0, 0, 0);
-  for (const t of entries) {
-    const d = new Date(t.date + "T00:00:00");
-    const idx = Math.floor((d.getTime() - base.getTime()) / (24 * 3600 * 1000));
-    if (idx >= 0 && idx < 7) dayMs[idx] += t.hours * 3600000; // convert to ms to match scale
+  useEffect(() => {
+    if (session?.user) {
+      // Fetch user-specific data
+      const fetchUserData = async () => {
+        try {
+          const response = await fetch('/api/user/stats');
+          if (response.ok) {
+            const stats = await response.json();
+            setUserData({
+              name: session.user.name,
+              email: session.user.email,
+              image: session.user.image,
+              stats
+            });
+          } else {
+            // Fallback to default data
+            setUserData({
+              name: session.user.name,
+              email: session.user.email,
+              image: session.user.image,
+              stats: {
+                totalClients: 0,
+                totalInvoices: 0,
+                totalHours: 0,
+              }
+            });
+          }
+        } catch (error) {
+          console.error('Error fetching user data:', error);
+          // Fallback to default data
+          setUserData({
+            name: session.user.name,
+            email: session.user.email,
+            image: session.user.image,
+            stats: {
+              totalClients: 0,
+              totalInvoices: 0,
+              totalHours: 0,
+            }
+          });
+        }
+      };
+
+      fetchUserData();
+    }
+  }, [session]);
+
+  if (status === "loading") {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
+          <p className="mt-4 text-black/70 dark:text-white/70">Loading...</p>
+        </div>
+      </div>
+    );
   }
-  const weekHours = dayMs.map((ms) => Math.round((ms / 3600000) * 10) / 10);
 
-  const cards = [
-    { href: "/dashboard/time", title: "Time Tracker", desc: "Start/stop timers and view summaries." },
-    { href: "/dashboard/invoices", title: "Invoices", desc: "Create and export invoices." },
-    { href: "/dashboard/clients", title: "Clients", desc: "Manage client details." },
-    { href: "/dashboard/tax", title: "Tax Overview", desc: "GST, TDS, and income tax estimates." },
-    { href: "/dashboard/expenses", title: "Expenses", desc: "Track expenses and deductions." },
-    { href: "/dashboard/reports", title: "Reports", desc: "Export summaries for your CA." },
-  ];
+  if (!session) {
+    return null;
+  }
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold">Welcome back</h1>
-      <p className="mt-1 text-black/70 dark:text-white/70">Your FreelanceFlow dashboard.</p>
+    <div className="min-h-screen bg-gradient-to-b from-background to-[hsl(220,20%,96%)] dark:to-[hsl(220,20%,8%)]">
+      <header className="border-b border-black/5 dark:border-white/10">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="h-8 w-8 rounded-md bg-gradient-to-br from-indigo-500 via-sky-500 to-emerald-500" />
+            <span className="font-semibold text-lg">Collector</span>
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
+              {userData?.image && (
+                <img 
+                  src={userData.image} 
+                  alt={userData.name || "User"} 
+                  className="w-8 h-8 rounded-full"
+                />
+              )}
+              <span className="text-sm font-medium">{userData?.name}</span>
+            </div>
+            <button
+              onClick={() => signOut({ callbackUrl: "/" })}
+              className="text-sm text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white"
+            >
+              Sign out
+            </button>
+          </div>
+        </div>
+      </header>
 
-      <div className="mt-6 grid gap-4 sm:grid-cols-4">
-        <div className="rounded-xl border border-black/10 dark:border-white/10 p-5">
-          <div className="text-sm text-black/60 dark:text-white/60">Revenue (this month)</div>
-          <div className="mt-1 text-2xl font-semibold">₹{kpiRevenue.toLocaleString("en-IN")}</div>
+      <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold">Welcome back, {userData?.name?.split(' ')[0]}!</h1>
+          <p className="text-black/70 dark:text-white/70 mt-2">Here's your dashboard overview.</p>
         </div>
-        <div className="rounded-xl border border-black/10 dark:border-white/10 p-5">
-          <div className="text-sm text-black/60 dark:text-white/60">GST (this month)</div>
-          <div className="mt-1 text-2xl font-semibold">₹{kpiGST.toLocaleString("en-IN")}</div>
-        </div>
-        <div className="rounded-xl border border-black/10 dark:border-white/10 p-5">
-          <div className="text-sm text-black/60 dark:text-white/60">TDS (this month)</div>
-          <div className="mt-1 text-2xl font-semibold">₹{kpiTDS.toLocaleString("en-IN")}</div>
-        </div>
-        <div className="rounded-xl border border-black/10 dark:border-white/10 p-5">
-          <div className="text-sm text-black/60 dark:text-white/60">Hours (this week)</div>
-          <MiniBar className="mt-3" values={weekHours} labels={["Mon","Tue","Wed","Thu","Fri","Sat","Sun"]} />
-        </div>
-      </div>
 
-      <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {cards.map((c) => (
-          <Link key={c.href} href={c.href} className="rounded-xl border border-black/10 dark:border-white/10 p-5 hover:shadow-sm transition">
-            <div className="text-lg font-semibold">{c.title}</div>
-            <div className="mt-1 text-sm text-black/70 dark:text-white/70">{c.desc}</div>
-          </Link>
-        ))}
-      </div>
+        <div className="grid gap-6 sm:grid-cols-3 mb-8">
+          <div className="rounded-xl border border-black/10 dark:border-white/10 p-6 bg-white/60 dark:bg-black/30 backdrop-blur">
+            <div className="text-sm text-black/60 dark:text-white/60">Total Clients</div>
+            <div className="mt-2 text-3xl font-bold">{userData?.stats?.totalClients || 0}</div>
+          </div>
+          <div className="rounded-xl border border-black/10 dark:border-white/10 p-6 bg-white/60 dark:bg-black/30 backdrop-blur">
+            <div className="text-sm text-black/60 dark:text-white/60">Total Invoices</div>
+            <div className="mt-2 text-3xl font-bold">{userData?.stats?.totalInvoices || 0}</div>
+          </div>
+          <div className="rounded-xl border border-black/10 dark:border-white/10 p-6 bg-white/60 dark:bg-black/30 backdrop-blur">
+            <div className="text-sm text-black/60 dark:text-white/60">Hours Tracked</div>
+            <div className="mt-2 text-3xl font-bold">{userData?.stats?.totalHours || 0}h</div>
+          </div>
+        </div>
+
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="rounded-xl border border-black/10 dark:border-white/10 p-6 bg-white/60 dark:bg-black/30 backdrop-blur hover:shadow-lg transition-all duration-300">
+            <div className="text-2xl mb-3">⏱️</div>
+            <h3 className="text-lg font-semibold mb-2">Time Tracking</h3>
+            <p className="text-sm text-black/70 dark:text-white/70 mb-4">Track your work hours and manage projects.</p>
+            <button className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline">Coming soon</button>
+          </div>
+          
+          <div className="rounded-xl border border-black/10 dark:border-white/10 p-6 bg-white/60 dark:bg-black/30 backdrop-blur hover:shadow-lg transition-all duration-300">
+            <div className="text-2xl mb-3">📄</div>
+            <h3 className="text-lg font-semibold mb-2">Invoices</h3>
+            <p className="text-sm text-black/70 dark:text-white/70 mb-4">Create and manage professional invoices.</p>
+            <button className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline">Coming soon</button>
+          </div>
+          
+          <div className="rounded-xl border border-black/10 dark:border-white/10 p-6 bg-white/60 dark:bg-black/30 backdrop-blur hover:shadow-lg transition-all duration-300">
+            <div className="text-2xl mb-3">👥</div>
+            <h3 className="text-lg font-semibold mb-2">Clients</h3>
+            <p className="text-sm text-black/70 dark:text-white/70 mb-4">Manage your client relationships.</p>
+            <button className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline">Coming soon</button>
+          </div>
+          
+          <div className="rounded-xl border border-black/10 dark:border-white/10 p-6 bg-white/60 dark:bg-black/30 backdrop-blur hover:shadow-lg transition-all duration-300">
+            <div className="text-2xl mb-3">💰</div>
+            <h3 className="text-lg font-semibold mb-2">Tax Overview</h3>
+            <p className="text-sm text-black/70 dark:text-white/70 mb-4">Track GST, TDS, and income tax.</p>
+            <button className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline">Coming soon</button>
+          </div>
+          
+          <div className="rounded-xl border border-black/10 dark:border-white/10 p-6 bg-white/60 dark:bg-black/30 backdrop-blur hover:shadow-lg transition-all duration-300">
+            <div className="text-2xl mb-3">📊</div>
+            <h3 className="text-lg font-semibold mb-2">Reports</h3>
+            <p className="text-sm text-black/70 dark:text-white/70 mb-4">Generate reports and analytics.</p>
+            <button className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline">Coming soon</button>
+          </div>
+          
+          <div className="rounded-xl border border-black/10 dark:border-white/10 p-6 bg-white/60 dark:bg-black/30 backdrop-blur hover:shadow-lg transition-all duration-300">
+            <div className="text-2xl mb-3">⚙️</div>
+            <h3 className="text-lg font-semibold mb-2">Settings</h3>
+            <p className="text-sm text-black/70 dark:text-white/70 mb-4">Configure your account preferences.</p>
+            <button className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline">Coming soon</button>
+          </div>
+        </div>
+      </main>
     </div>
   );
 }
-
-
