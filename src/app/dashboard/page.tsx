@@ -4,11 +4,21 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { signOut } from "next-auth/react";
+import Image from "next/image";
 
 export default function DashboardPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const [userData, setUserData] = useState<any>(null);
+  const [userData, setUserData] = useState<{
+    name?: string;
+    email?: string;
+    image?: string;
+    stats?: {
+      totalClients: number;
+      totalInvoices: number;
+      totalHours: number;
+    };
+  } | null>(null);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -25,17 +35,17 @@ export default function DashboardPage() {
           if (response.ok) {
             const stats = await response.json();
             setUserData({
-              name: session.user.name,
-              email: session.user.email,
-              image: session.user.image,
+              name: session.user?.name || undefined,
+              email: session.user?.email || undefined,
+              image: session.user?.image || undefined,
               stats
             });
           } else {
             // Fallback to default data
             setUserData({
-              name: session.user.name,
-              email: session.user.email,
-              image: session.user.image,
+              name: session.user?.name || undefined,
+              email: session.user?.email || undefined,
+              image: session.user?.image || undefined,
               stats: {
                 totalClients: 0,
                 totalInvoices: 0,
@@ -47,9 +57,9 @@ export default function DashboardPage() {
           console.error('Error fetching user data:', error);
           // Fallback to default data
           setUserData({
-            name: session.user.name,
-            email: session.user.email,
-            image: session.user.image,
+            name: session.user?.name || undefined,
+            email: session.user?.email || undefined,
+            image: session.user?.image || undefined,
             stats: {
               totalClients: 0,
               totalInvoices: 0,
@@ -89,9 +99,11 @@ export default function DashboardPage() {
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-3">
               {userData?.image && (
-                <img 
+                <Image 
                   src={userData.image} 
                   alt={userData.name || "User"} 
+                  width={32}
+                  height={32}
                   className="w-8 h-8 rounded-full"
                 />
               )}
@@ -110,7 +122,7 @@ export default function DashboardPage() {
       <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold">Welcome back, {userData?.name?.split(' ')[0]}!</h1>
-          <p className="text-black/70 dark:text-white/70 mt-2">Here's your dashboard overview.</p>
+          <p className="text-black/70 dark:text-white/70 mt-2">Here&apos;s your dashboard overview.</p>
         </div>
 
         <div className="grid gap-6 sm:grid-cols-3 mb-8">

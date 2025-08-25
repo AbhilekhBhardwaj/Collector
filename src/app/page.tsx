@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export default function Home() {
@@ -92,7 +91,7 @@ export default function Home() {
                 },
                 { 
                   title: "Dark Mode", 
-                  description: "Beautiful dark theme that's easy on your eyes.",
+                  description: "Beautiful dark theme that&apos;s easy on your eyes.",
                   icon: "🌙"
                 },
                 { 
@@ -126,7 +125,7 @@ export default function Home() {
                   Collector is designed to be simple yet powerful. We believe that great software should be intuitive, fast, and beautiful.
                 </p>
                 <p className="text-lg text-black/70 dark:text-white/70 mb-8">
-                  Whether you're a developer, designer, or just someone who appreciates well-crafted tools, Collector has something for you.
+                  Whether you&apos;re a developer, designer, or just someone who appreciates well-crafted tools, Collector has something for you.
                 </p>
                 <div className="flex flex-wrap gap-4">
                   <div className="flex items-center gap-2 text-sm text-black/60 dark:text-white/60">

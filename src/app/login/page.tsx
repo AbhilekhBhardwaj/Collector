@@ -3,6 +3,7 @@
 import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 export default function LoginPage() {
   const { data: session, status } = useSession();
@@ -70,9 +71,9 @@ export default function LoginPage() {
           }
         }
       }
-    } catch (error) {
-      setError("Something went wrong");
-    } finally {
+         } catch {
+       setError("Something went wrong");
+     } finally {
       setLoading(false);
     }
   };
@@ -181,9 +182,9 @@ export default function LoginPage() {
           </div>
           
           <div className="mt-4 text-center">
-            <a href="/" className="text-sm text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white">
+            <Link href="/" className="text-sm text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white">
               ← Back to home
-            </a>
+            </Link>
           </div>
         </div>
       </div>
